@@ -37,7 +37,7 @@ export default function NewDiaryPage() {
                 duration: 3000
             })
 
-            router.push('/diary')
+            router.push('/')
         } catch (error) {
             console.error('일기 저장 중 오류 발생:', error)
             toast({

@@ -6,7 +6,6 @@ import Link from 'next/link'
 import { Diary } from '@/lib/types'
 import { Button } from '@/components/ui/button'
 import { EmotionBadge } from '@/components/EmotionBadge'
-import { getEmotionColor } from '@/lib/utils'
 import {
     Card,
     CardContent,
@@ -42,7 +41,7 @@ export default function DiaryDetailPage({
             (d: Diary) => d.id !== params.id
         )
         localStorage.setItem('diaries', JSON.stringify(updatedDiaries))
-        router.push('/diary')
+        router.push('/')
     }
 
     if (!diary) {
