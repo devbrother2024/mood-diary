@@ -2,20 +2,35 @@
 
 import { DiaryList } from '@/components/DiaryList'
 import { Button } from '@/components/ui/button'
-import { Diary } from '@/lib/types'
 import { PlusCircle } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
+import { DiaryTable, getAllDiaries } from '@/lib/api'
 
 export default function Home() {
-    const [diaries, setDiaries] = useState<Diary[]>([])
+    const [diaries, setDiaries] = useState<DiaryTable[]>([])
+    const [isLoading, setIsLoading] = useState(true)
+    const [error, setError] = useState<string | null>(null)
 
     useEffect(() => {
-        // TODO: 실제 API 호출로 대체해야 합니다.
-        const storedDiaries = JSON.parse(
-            localStorage.getItem('diaries') || '[]'
-        )
-        setDiaries(storedDiaries)
+        async function fetchDiaries() {
+            try {
+                setIsLoading(true)
+                const data = await getAllDiaries()
+                setDiaries(data)
+                setError(null)
+            } catch (err) {
+                setError(
+                    err instanceof Error
+                        ? err.message
+                        : '일기 목록을 불러오는데 실패했습니다.'
+                )
+            } finally {
+                setIsLoading(false)
+            }
+        }
+
+        fetchDiaries()
     }, [])
 
     return (
@@ -33,7 +48,21 @@ export default function Home() {
                             </Button>
                         </Link>
                     </div>
-                    <DiaryList diaries={diaries} />
+
+                    {isLoading ? (
+                        <div className="text-center py-8">
+                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto"></div>
+                            <p className="mt-2 text-gray-600">
+                                일기를 불러오는 중...
+                            </p>
+                        </div>
+                    ) : error ? (
+                        <div className="text-center py-8 text-red-600">
+                            <p>{error}</p>
+                        </div>
+                    ) : (
+                        <DiaryList diaries={diaries} />
+                    )}
                 </div>
             </div>
         </div>

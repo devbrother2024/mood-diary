@@ -1,11 +1,11 @@
 import Link from 'next/link'
-import { Diary } from '@/lib/types'
 import { EmotionBadge } from './EmotionBadge'
 import { motion } from 'framer-motion'
 import { Card, CardContent } from '@/components/ui/card'
+import { DiaryTable } from '@/lib/api'
 
 interface DiaryListProps {
-    diaries: Diary[]
+    diaries: DiaryTable[]
 }
 
 export function DiaryList({ diaries }: DiaryListProps) {
