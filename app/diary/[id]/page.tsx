@@ -71,10 +71,6 @@ export default function DiaryDetailPage({
                                 weekday: 'long'
                             })}
                         </CardTitle>
-                        <p className="text-sm text-gray-500">
-                            작성일:{' '}
-                            {new Date(diary.createdAt).toLocaleString('ko-KR')}
-                        </p>
                     </CardHeader>
                     <CardContent className="pt-6">
                         <div className="mb-4">
