@@ -5,18 +5,33 @@ import { Button } from '@/components/ui/button'
 import { PlusCircle } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { DiaryTable, getAllDiaries } from '@/lib/api'
+import { DiaryTable, getAllDiaries, EmotionType, SortOrder } from '@/lib/api'
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue
+} from '@/components/ui/select'
 
 export default function Home() {
     const [diaries, setDiaries] = useState<DiaryTable[]>([])
     const [isLoading, setIsLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
+    const [emotionFilter, setEmotionFilter] = useState<EmotionType | 'all'>(
+        'all'
+    )
+    const [sortOrder, setSortOrder] = useState<SortOrder>('desc')
 
     useEffect(() => {
         async function fetchDiaries() {
             try {
                 setIsLoading(true)
-                const data = await getAllDiaries()
+                const data = await getAllDiaries({
+                    emotion:
+                        emotionFilter === 'all' ? undefined : emotionFilter,
+                    sortOrder: sortOrder
+                })
                 setDiaries(data)
                 setError(null)
             } catch (err) {
@@ -31,7 +46,7 @@ export default function Home() {
         }
 
         fetchDiaries()
-    }, [])
+    }, [emotionFilter, sortOrder])
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-blue-50 to-purple-50 py-8">
@@ -47,6 +62,42 @@ export default function Home() {
                                 작성
                             </Button>
                         </Link>
+                    </div>
+
+                    <div className="flex flex-col sm:flex-row gap-4 mb-6">
+                        <Select
+                            value={emotionFilter}
+                            onValueChange={(value: EmotionType | 'all') =>
+                                setEmotionFilter(value)
+                            }
+                        >
+                            <SelectTrigger className="w-[180px]">
+                                <SelectValue placeholder="감정 선택" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">모든 감정</SelectItem>
+                                <SelectItem value="행복">행복</SelectItem>
+                                <SelectItem value="슬픔">슬픔</SelectItem>
+                                <SelectItem value="분노">분노</SelectItem>
+                                <SelectItem value="평범">평범</SelectItem>
+                                <SelectItem value="신남">신남</SelectItem>
+                            </SelectContent>
+                        </Select>
+
+                        <Select
+                            value={sortOrder}
+                            onValueChange={(value: SortOrder) =>
+                                setSortOrder(value)
+                            }
+                        >
+                            <SelectTrigger className="w-[180px]">
+                                <SelectValue placeholder="정렬 순서" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="desc">최신순</SelectItem>
+                                <SelectItem value="asc">오래된순</SelectItem>
+                            </SelectContent>
+                        </Select>
                     </div>
 
                     {isLoading ? (

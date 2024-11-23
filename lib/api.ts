@@ -3,6 +3,9 @@ import { supabase } from './supabase'
 // 감정 상태를 위한 ENUM 타입 정의
 export type EmotionType = '행복' | '슬픔' | '분노' | '평범' | '신남'
 
+// 정렬 순서 타입 정의
+export type SortOrder = 'asc' | 'desc'
+
 // Database 테이블 타입 정의
 export interface DiaryTable {
     id: string // UUID
@@ -13,12 +16,29 @@ export interface DiaryTable {
     updated_at: string // TIMESTAMP WITH TIME ZONE
 }
 
-// 모든 일기 조회
-export async function getAllDiaries(): Promise<DiaryTable[]> {
-    const { data, error } = await supabase
-        .from('diaries')
-        .select('*')
-        .order('date', { ascending: false })
+// 일기 조회를 위한 필터 타입
+export interface DiaryFilter {
+    emotion?: EmotionType
+    sortOrder?: SortOrder
+}
+
+// 모든 일기 조회 (필터링과 정렬 지원)
+export async function getAllDiaries(
+    filter?: DiaryFilter
+): Promise<DiaryTable[]> {
+    let query = supabase.from('diaries').select('*')
+
+    // 감정 필터 적용
+    if (filter?.emotion) {
+        query = query.eq('emotion', filter.emotion)
+    }
+
+    // 정렬 적용
+    query = query.order('date', {
+        ascending: filter?.sortOrder === 'asc'
+    })
+
+    const { data, error } = await query
 
     if (error) {
         throw new Error('일기 목록을 불러오는데 실패했습니다: ' + error.message)
